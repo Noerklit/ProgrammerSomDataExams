@@ -16,3 +16,44 @@ også beholdes kun de værdier som er større end konstanten.
 
 1.3 
 let exam3 = Every(Write(Prim("<", numbers, And(Write(CstS "\n"), numbers ))))
+Her anvendes Prim til at opsætte en operator som sammenligner det første tal fra den generede talrække i numbers,
+med tallene i talrækken numbers. Samtidig med dette anvendes And i kombination med write, da And smider den anden af de to værdier
+den er givet væk, kan denne opsætning bruges til for hver sammenligning operatoren laver, at skrive en ny linje efter resultatet er skrevet.
+Ergo bliver sammenligningen først 5 < 5, der skrives derfor ikke et tal da det ikke holder, men der skrives stadig en linje,
+derfor første linje når man kører exam3 er en tom linje. Herefter sammenlignes 5 nu med resterende talrække 6-12 og denne udskrives.
+Så er først generede talrække på 6 og processen gentages, osv.
+
+
+1.4 
+type expr = 
+| ...
+| FromToChar of char * char
+
+let rec eval (e : expr) (cont : cont) (econt : econt) = 
+    match e with
+    | ...
+    | FromToChar (c1, c2) -> 
+      let i1 = int c1
+      let i2 = int c2
+      if i1 > i2 then
+        econt ()  // Fejl: c1 ligger efter c2
+      else
+        let rec loop i =
+            if i <= i2 then
+                cont (Str (string (char i))) (fun () -> loop (i + 1))
+            else
+                econt ()
+        loop i1
+
+
+1.5
+let rec eval (e : expr) (cont : cont) (econt : econt) = 
+    match e with
+    |...
+    | ("<", Str c1, Str c2) ->
+            if c1<c2 then
+                cont (Str c2) econt2
+            else
+                econt2 ()
+
+1.6

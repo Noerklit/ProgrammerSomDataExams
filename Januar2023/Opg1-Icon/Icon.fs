@@ -35,13 +35,14 @@ type expr =
   | Or  of expr * expr
   | Seq of expr * expr
   | Every of expr 
+  | FromToChar of char * char
   | Fail;;
 
 (* Runtime values and runtime continuations *)
 
 type value = 
   | Int of int
-  | Str of string;;
+  | Str of string
 
 type econt = unit -> value;;
 
@@ -85,6 +86,11 @@ let rec eval (e : expr) (cont : cont) (econt : econt) =
                       cont (Int i2) econt2
                   else
                       econt2 ()
+              | ("<", Str c1, Str c2) ->
+                  if c1<c2 then
+                      cont (Str c2) econt2
+                  else
+                      econt2 ()
               | _ -> Str "unknown prim2")
               econt1)
           econt
@@ -98,6 +104,15 @@ let rec eval (e : expr) (cont : cont) (econt : econt) =
     | Every e -> 
       eval e (fun _ -> fun econt1 -> econt1 ())
              (fun () -> cont (Int 0) econt)
+    | FromToChar(c1, c2) ->
+      let i1 = int c1
+      let i2 = int c2
+      let rec loop i = 
+          if i <= i2 then 
+              cont (Str (string(char i))) (fun () -> loop (i+1))
+          else 
+              econt ()
+      loop i1
     | Fail -> econt ()
 
 let run e = eval e (fun v -> fun _ -> v) (fun () -> (printfn "Failed"; Int 0));
@@ -110,6 +125,13 @@ let exam1 = Every(Write(numbers))
 let exam2 = Every(Write(Prim("<", CstI 10, numbers)))
 
 let exam3 = Every(Write(Prim("<", numbers, And(Write(CstS "\n"), numbers ))))
+
+let chars = FromToChar('C', 'L')
+
+let exam4 = run (Prim("<", CstS "A", CstS "B"));;
+let exam5 = run (Prim("<", CstS "B", CstS "A"));;
+
+let exam6 = Every(Write(Prim("<", CstS "G", chars)))
 
 (* Examples in abstract syntax *)
 
