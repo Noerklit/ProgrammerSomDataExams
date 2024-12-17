@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fmtPKojsQ6g=",
+  "success": true,
+  "projectFilePath": "/mnt/c/Users/mchrn/ITU/5_Semester/Programs_as_data/Exam/TrialExam2024/Kommatal/kommatal.fsproj",
+  "expectedPackageFiles": [
+    "/home/macj/.nuget/packages/fsharp.core/8.0.400/fsharp.core.8.0.400.nupkg.sha512"
+  ],
+  "logs": []
+}

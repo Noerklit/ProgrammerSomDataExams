@@ -1,0 +1,114 @@
+Opg 1 - Regulære udtryk og automater
+
+1. Giv en uformel beskrivelse af sproget (mængden af alle strenge) der beskrives af dette regulære
+udtryk. Giv mindst 4 eksempler på kommatal der genkendes af dette regulære udtryk og som
+understøtter din uformelle beskrivelse.
+
+- Det regulære udtryk genkender tal hvor der først kommer mindst et, men det kan være flere, ciffer/cifre fra 0-9. 
+Herefter forekommer der enten 0 eller 1 enkelt komma. Til slut kan der følge 0 eller flere cifre fra 0-9. 
+Eksempler på kommatal som genkendes af det regulære udtryk:
+- 1,1
+- 2345,6
+- 12,12321312431
+- 123241
+- 0,98721
+
+
+2. Betragt tilstandsmaskinen nedenfor, og besvar følgende spørgsmål
+
+a. Vil tilstandsmaskinen acceptere netop de strenge, som genkendes af det regulære udtryk
+ovenfor?
+- Ja det vil den. Fra state 1 til state 2 er det påkrævet at vi udfylder et tal fra 0-9. Herefter får vi to muligheder.
+Enten fortsætter vi til state 3 via epsilon. Fra state 3, kan vi kun navigere tilbage til state 2 og sætte endnu et ciffer fra 0-9. 
+Fra state 2 kan vi også navigere til state 4 via epsilon, betydende at vi ikke sætter et ciffer. 
+Dette opfylder d+ i det regulære udtryk, da vi fra state 1 til 2, skal sætte et enkelt ciffer fra 0-9, og herefter vælge om vi sætter flere.
+Fra state 4 skal vi navigere til state 5, enten via epsilon eller ved at sætte et komma. Da vi fra state 5 ikke kan navigere tilbage,
+opfylder dette ','? i det regulære udtryk. 
+Fra state 5 har vi igen to states vi kan navigere til. Til state 6 via epsilon, hvorefter vi kun kan navigere tilbage til state 5 ved at sætte
+et ciffer fra 0-9. Fra state 5 kan vi også navigere til state 7 via epsilon, som er en final state. Fra state 5 kan vi altså vælge ikke at 
+sætte flere cifre, eller sætte så mange cifre fra 0-9 som vi har lyst til dette. Dette opfylder d* i det regulære udtryk.
+
+b. Er tilstandsmaskinen deterministisk (DFA) eller ikke–deterministisk (NFA)?
+- Tilstandsmaskinen er NFA da der bruges epsilon moves, hvilket ikke er tilladt i en DFA. 
+
+
+3. Angiv et regulært udtryk, der beskriver kommatal, med følgende egenskaber:
+• Der tillades kommatal uden komma, dvs. heltal.
+• Der tillades maksimalt et komma, og når der er et komma skal der også være mindst et tal
+foran og efter kommaet.
+• Den tomme streng genkendes også af det regulære udtryk.
+Der lægges vægt på at det regulære udtryk ikke umiddelbart kan skrives kortere
+
+Mit regulære udtryk anvender alfabetet{d, ',' , ''}, hvor d står er et tal fra 0-9, ',' er et komma og '' er den tomme streng.
+
+- ''? d+ ?<=d','??=d d*
+- (d+','d+|d+|)
+
+4. Se i kommatal mappen. Kommatal.fsl har lexer specifikationen. fsproj filen har min path til DLL så jeg kan dotnet build og dotnet run. 
+Jeg bruger fslex --unicode kommatal.fsl til at genere kommatal.fs og kommatal.fsi ud fra specifikationen, så jeg kan runne det efter.
+
+
+
+Opg 2 - Icon
+Se Icon mappen. Her køres dotnet fsi -r /mnt/c/Users/mchrn/ITU/5_Semester/Programs_as_data/fsharp/FsLexYacc.Runtime.dll Icon.fs
+Derefter i F# interactive kører jeg open Icon;;
+Herefter kan jeg køre run examEx1;; 
+
+1. Et Icon udtryk som udskriver værdierne 123456 val it : value = Int 0
+let examOpg1 = Every (Write (FromTo(1,6)));
+Jeg anvender FromTo til at genere en sekvens af tal fra et givent interval, i dette tilfælde 1-6.
+Herefter bruger jeg Write til at få skrevet de tal der genereres, 
+med Every således at der udskrives alle tallene og ikke blot det første tal
+
+
+2. Et Icon udtryk som udskriver 33 34 43 44 53 54 63 64 val it : value = Int 0
+
+let examOpg2 = Every (Write (Prim ("+", Prim("*", CstI 10, FromTo(3,6)), FromTo(3,4))));
+let examOpg2V2 = Every(Seq(FromTo (3,6), Seq(FromTo (3,4), Write(Prim("+", Prim("*", FromTo(3,6), CstI 10), FromTo(3,4))))));
+
+
+3. Udvid implementationen af Icon med en ny generator FromToBy(s,e,i), som genererer værdierne fra s til og med e i hop af i. 
+Det antages at s <= e og i >= 0. FromToBy fejler med det samme, hvis s > e eller i < 0.
+
+| FromToBy(s, e, i) ->
+      let rec loop s = 
+          if s <= e && i >= 0 then
+              cont (Int s) (fun () -> loop (s + i))
+          else
+              econt ()
+      loop s
+
+4. Skriv en udgave af dit svar til opgave 2 ovenfor, som anvender generatoren FromToBy
+
+let examOpg4 = Every (Write (Prim ("+", Prim("*", CstI 10, FromToBy(3,6,1)), FromToBy(3,4,1))));
+
+
+5. Kan du få konstruktionen FromToBy til at generere det samme tal, fx 10, uendelig mange gange?
+Hvis, ja, så giv et eksempel.
+
+Dette kan godt lade sig gøre, da det er muligt at angive inkrementeringen til at være 0.
+let examOpg5 = Every (Write (FromToBy(10,11,0)));
+
+
+
+Opg 3 - Print i micro-ML 
+
+1. I den abstrakte syntaks repræsenteres funktionen print med Print e, hvor e er et vilkårligt udtryk. 
+Udvid typen expr i Absyn.fs med Print således at eksempelvis Print(CstI 1) repræsenterer udtrykket der printer konstanten 1 på skærmen og returnerer værdien 1.
+
+Se svaret i Opgave 3 mappen i filen Absyn.fs eller her:
+type expr = 
+  | CstI of int
+  | CstB of bool
+  | Var of string
+  | Let of string * expr * expr
+  | Prim of string * expr * expr
+  | If of expr * expr * expr
+  | Letfun of string * string * expr * expr    (* (f, x, fBody, letBody) *)
+  | Call of expr * expr
+  | Print of expr
+
+
+2. Udvid lexer og parser, således at print er understøttet med syntaksen print e, hvor print er et
+nyt nøgleord, se funktionen keyword i filen FunLex.fsl.
+
