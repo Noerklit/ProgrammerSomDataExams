@@ -1,6 +1,6 @@
 Opg 1 - Regulære udtryk og automater
 
-1. Giv en uformel beskrivelse af sproget (mængden af alle strenge) der beskrives af dette regulære
+1.1 Giv en uformel beskrivelse af sproget (mængden af alle strenge) der beskrives af dette regulære
 udtryk. Giv mindst 4 eksempler på kommatal der genkendes af dette regulære udtryk og som
 understøtter din uformelle beskrivelse.
 
@@ -14,7 +14,7 @@ Eksempler på kommatal som genkendes af det regulære udtryk:
 - 0,98721
 
 
-2. Betragt tilstandsmaskinen nedenfor, og besvar følgende spørgsmål
+1.2 Betragt tilstandsmaskinen nedenfor, og besvar følgende spørgsmål
 
 a. Vil tilstandsmaskinen acceptere netop de strenge, som genkendes af det regulære udtryk
 ovenfor?
@@ -32,7 +32,7 @@ b. Er tilstandsmaskinen deterministisk (DFA) eller ikke–deterministisk (NFA)?
 - Tilstandsmaskinen er NFA da der bruges epsilon moves, hvilket ikke er tilladt i en DFA. 
 
 
-3. Angiv et regulært udtryk, der beskriver kommatal, med følgende egenskaber:
+1.3 Angiv et regulært udtryk, der beskriver kommatal, med følgende egenskaber:
 • Der tillades kommatal uden komma, dvs. heltal.
 • Der tillades maksimalt et komma, og når der er et komma skal der også være mindst et tal
 foran og efter kommaet.
@@ -44,7 +44,7 @@ Mit regulære udtryk anvender alfabetet{d, ',' , ''}, hvor d står er et tal fra
 - ''? d+ ?<=d','??=d d*
 - (d+','d+|d+|)
 
-4. Se i kommatal mappen. Kommatal.fsl har lexer specifikationen. fsproj filen har min path til DLL så jeg kan dotnet build og dotnet run. 
+1.4 Se i kommatal mappen. Kommatal.fsl har lexer specifikationen. fsproj filen har min path til DLL så jeg kan dotnet build og dotnet run. 
 Jeg bruger fslex --unicode kommatal.fsl til at genere kommatal.fs og kommatal.fsi ud fra specifikationen, så jeg kan runne det efter.
 
 
@@ -54,20 +54,20 @@ Se Icon mappen. Her køres dotnet fsi -r /mnt/c/Users/mchrn/ITU/5_Semester/Progr
 Derefter i F# interactive kører jeg open Icon;;
 Herefter kan jeg køre run examEx1;; 
 
-1. Et Icon udtryk som udskriver værdierne 123456 val it : value = Int 0
+2.1 Et Icon udtryk som udskriver værdierne 123456 val it : value = Int 0
 let examOpg1 = Every (Write (FromTo(1,6)));
 Jeg anvender FromTo til at genere en sekvens af tal fra et givent interval, i dette tilfælde 1-6.
 Herefter bruger jeg Write til at få skrevet de tal der genereres, 
 med Every således at der udskrives alle tallene og ikke blot det første tal
 
 
-2. Et Icon udtryk som udskriver 33 34 43 44 53 54 63 64 val it : value = Int 0
+2.2 Et Icon udtryk som udskriver 33 34 43 44 53 54 63 64 val it : value = Int 0
 
 let examOpg2 = Every (Write (Prim ("+", Prim("*", CstI 10, FromTo(3,6)), FromTo(3,4))));
 let examOpg2V2 = Every(Seq(FromTo (3,6), Seq(FromTo (3,4), Write(Prim("+", Prim("*", FromTo(3,6), CstI 10), FromTo(3,4))))));
 
 
-3. Udvid implementationen af Icon med en ny generator FromToBy(s,e,i), som genererer værdierne fra s til og med e i hop af i. 
+2.3 Udvid implementationen af Icon med en ny generator FromToBy(s,e,i), som genererer værdierne fra s til og med e i hop af i. 
 Det antages at s <= e og i >= 0. FromToBy fejler med det samme, hvis s > e eller i < 0.
 
 | FromToBy(s, e, i) ->
@@ -78,12 +78,12 @@ Det antages at s <= e og i >= 0. FromToBy fejler med det samme, hvis s > e eller
               econt ()
       loop s
 
-4. Skriv en udgave af dit svar til opgave 2 ovenfor, som anvender generatoren FromToBy
+2.4 Skriv en udgave af dit svar til opgave 2 ovenfor, som anvender generatoren FromToBy
 
 let examOpg4 = Every (Write (Prim ("+", Prim("*", CstI 10, FromToBy(3,6,1)), FromToBy(3,4,1))));
 
 
-5. Kan du få konstruktionen FromToBy til at generere det samme tal, fx 10, uendelig mange gange?
+2.5 Kan du få konstruktionen FromToBy til at generere det samme tal, fx 10, uendelig mange gange?
 Hvis, ja, så giv et eksempel.
 
 Dette kan godt lade sig gøre, da det er muligt at angive inkrementeringen til at være 0.
@@ -93,7 +93,7 @@ let examOpg5 = Every (Write (FromToBy(10,11,0)));
 
 Opg 3 - Print i micro-ML 
 
-1. I den abstrakte syntaks repræsenteres funktionen print med Print e, hvor e er et vilkårligt udtryk. 
+3.1 I den abstrakte syntaks repræsenteres funktionen print med Print e, hvor e er et vilkårligt udtryk. 
 Udvid typen expr i Absyn.fs med Print således at eksempelvis Print(CstI 1) repræsenterer udtrykket der printer konstanten 1 på skærmen og returnerer værdien 1.
 
 Se svaret i Opgave 3 mappen i filen Absyn.fs eller her:
@@ -109,6 +109,173 @@ type expr =
   | Print of expr
 
 
-2. Udvid lexer og parser, således at print er understøttet med syntaksen print e, hvor print er et
+3.2 Udvid lexer og parser, således at print er understøttet med syntaksen print e, hvor print er et
 nyt nøgleord, se funktionen keyword i filen FunLex.fsl.
 
+I funLex.fsl:
+let keyword s =
+    match s with
+    | "else"  -> ELSE 
+    | "end"   -> END
+    | "false" -> CSTBOOL false
+    | "if"    -> IF
+    | "in"    -> IN
+    | "let"   -> LET
+    | "not"   -> NOT
+    | "then"  -> THEN
+    | "true"  -> CSTBOOL true
+    | "print" -> PRINT
+    | _       -> NAME s
+
+Derudover tilføjes Token i FunPar.fsy
+%token ELSE END FALSE IF IN LET NOT THEN TRUE PRINT
+%token PLUS MINUS TIMES DIV MOD
+%token EQ NE GT LT GE LE
+%token LPAR RPAR 
+%token EOF
+Og i samme fil:
+Expr:
+    AtExpr                              { $1                     }
+  | AppExpr                             { $1                     }
+  | IF Expr THEN Expr ELSE Expr         { If($2, $4, $6)         }
+  | MINUS Expr                          { Prim("-", CstI 0, $2)  }
+  | Expr PLUS  Expr                     { Prim("+",  $1, $3)     }
+  | Expr MINUS Expr                     { Prim("-",  $1, $3)     }
+  | Expr TIMES Expr                     { Prim("*",  $1, $3)     }
+  | Expr DIV   Expr                     { Prim("/",  $1, $3)     } 
+  | Expr MOD   Expr                     { Prim("%",  $1, $3)     }
+  | Expr EQ    Expr                     { Prim("=",  $1, $3)     }
+  | Expr NE    Expr                     { Prim("<>", $1, $3)     }
+  | Expr GT    Expr                     { Prim(">",  $1, $3)     }
+  | Expr LT    Expr                     { Prim("<",  $1, $3)     }
+  | Expr GE    Expr                     { Prim(">=", $1, $3)     }
+  | Expr LE    Expr                     { Prim("<=", $1, $3)     }
+  | PRINT      Expr                     { Print($2)              }
+;
+
+Abstrakt syntaks for eksempler:
+ex1: print 1   =                        Print(CstI 1)
+ex2: print ((print 1) + 3)   =          Print(Prim("+", Print(CstI 1), CstI 3))  
+ex3: let f x = x + 1 in print f end  =  Letfun("f", "x", Prim("+", Var "x", CstI 1), Print(Var "f")) 
+3 Yderligere eksempler med både konstanter og funktioner:
+ex4: 
+
+
+
+3.3 Udvid funktionen eval i HigherFun.fs, med evaluering af Print e. 
+Hvis v er værdien af at evaluere e, så er resultatet af Print e at udskrive v på skærmen samt returnere v.
+
+I HigherFun.fs:
+let printValue v = printfn "%A" v (*Svar til 3.3*)
+
+| Print e -> 
+      let v = eval e env
+      printValue v; v
+
+For at få lov til at køre tjekket som er i hintet, skal køres:
+dotnet fsi -r /mnt/c/Users/mchrn/ITU/5_Semester/Programs_as_data/fsharp/FsLexYacc.Runtime.dll Util.fs Absyn.fs FunPar.fs FunLex.fs Parse.fs HigherFun.fs ParseAndRunHigher.fs
+open ParseAndRunHigher;;
+Også kan man skrive: run(fromString "let f x = x + 1 in print f end");;
+
+
+
+
+Opg 4 - Tupler i List-C - Det her bliver godt nok svært at kunne til eksamen
+Implementation laves ved at følge den givne opskrift/hints
+
+Absyn.fs:
+and expr =
+| ...
+| PrimN of string * expr list
+
+CPar.fsy:
+%token TUP NTH UPD
+
+AtExprNotAccess:
+| ...
+| TUP LPAR Exprs RPAR                       { PrimN("tup", $3)      } 
+| NTH LPAR Expr COMMA Expr RPAR             { PrimN("nth", [$3;$5]) }
+| UPD LPAR Expr COMMA Expr COMMA Expr RPAR  {PrimN("upd", [$3;$5;$7])}
+
+CLex.fsl
+let keyword s =
+    match s with
+    | ...
+    | "tup"     -> TUP
+    | "nth"     -> NTH
+    | "upd"     -> UPD  
+
+Machine.fs:
+type instr =
+| ...
+| TUP of int                         (* Exam *)
+| NTH                                (* Exam *)
+| UPD                                (* Exam *)
+
+let CODETUP    = 32;
+let CODENTH    = 33;
+let CODEUPD    = 34;
+
+let makelabenv (addr, labenv) instr = 
+    match instr with
+    | ...
+    | TUP n          -> (addr+2, labenv)
+    | NTH            -> (addr+1, labenv)
+    | UPD            -> (addr+1, labenv)
+
+
+Comp.fs:
+and cExpr (e : expr) (varEnv : varEnv) (funEnv : funEnv) : instr list = 
+    match e with
+    | ...
+    | PrimN("tup", es) ->
+      let n = List.length es
+      cExprs es varEnv funEnv @ [TUP n]
+    | PrimN("nth", [ep;ei]) ->
+      cExprs [ep;ei] varEnv funEnv @ [NTH]
+    | PrimN("upd", [ep;ei;ev]) ->
+      cExprs [ep;ei;ev] varEnv funEnv @ [UPD]
+    | PrimN(_,_) -> raise (Failure "unknown primitive N")
+
+
+listmachine.c:
+#define TUPLETAG 1
+
+#define TUP 32
+#define NTH 33
+#define UPD 34
+
+void printInstruction(word p[], word pc) {
+  switch (p[pc]) {
+  case ...
+  case TUP: printf("TUP " WORD_FMT, p[pc+1]); break;
+  case NTH: printf("NTH"); break;
+  case UPD: printf("UPD"); break;
+  }
+}
+
+int execcode(word p[], word s[], word iargs[], int iargc, int /* boolean */ trace) {
+  ...
+    ...
+    case TUP:{
+      word count = p[pc++];
+      word* p = allocate(TUPLETAG, count, s, sp);
+      for(int i = 0; i<count; i++){
+        p[i+1] = s[sp-i];
+      }
+      sp-=count-1;
+      s[sp] = (word)p;
+    } break;
+    case NTH:{
+        int idx = Untag(s[sp--]);
+        word* p = (word*)s[sp];
+        s[sp] = p[idx+1];
+      }break;
+    case UPD:{
+      word value = s[sp--];
+      int idx = Untag(s[sp--]);
+      word* p = (word*)s[sp];
+      p[idx+1] = value;
+      s[sp] = (word)p;
+    }break;
+}
