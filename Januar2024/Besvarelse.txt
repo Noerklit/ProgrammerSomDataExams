@@ -1,0 +1,55 @@
+Opg 1 - Icon
+
+1.1 
+let examEx2 = Every(Write(FromTo(5,12)))
+Jeg anvender her FromTo til at genere en talrække fra 5-12. Jeg bruger Write til at indikere jeg vil have værdierne udskrevet
+og til slut bruges Every til at indikere at det skal være hver enkelt værdi der skal udskrives, så der skrives hele talrækken
+i stedet for blot at være den første værdi
+
+
+1.2
+let examEx3 = Every(Write(Prim("*", CstI 3, FromTo(1,20))));
+Her anvender jeg igen Every og Write til at indikere at jeg vil udskrive alle værdier generet.
+Jeg anvender Prim til at definere at jeg gerne vil gange 2 værdier, jeg definerer konstanten 3 og generer en talrække fra 1-20
+dette betyder at alle tallene i talrækken vil blive ganget med 3 og derefter blive udskrevet.
+
+
+1.3
+let examEx4 = Every(Write(Prim("+", CstI 1, Prim("*", CstI 3, FromTo(1,20)))))
+Her anvender jeg min løsning fra 1.2, men har tilføjet at der skal lægges 1 til resultatet af 3 gange værdien fra talrækken 
+før det printes således at alle tallene opfylder at 3 går op i n-1.
+
+
+1.4
+type expr = 
+| ...
+| RandomFromList of int * int list
+
+let rec eval (e : expr) (cont : cont) (econt : econt) = 
+    match e with
+    | ...
+    | RandomFromList (n, xs) ->
+      if n <= 0 || List.isEmpty xs then
+        econt ()  // Fejler med det samme, hvis betingelserne ikke opfyldes
+      else
+        let rand = System.Random()
+        let rec loop i =
+            if i < n then
+                let rndIdx = rand.Next(0, List.length xs)  // Vælg et tilfældigt indeks i listen
+                let value = List.item rndIdx xs            // Hent værdien fra listen
+                cont (Int value) (fun () -> loop (i + 1))  // Send værdien videre til success-kontinuiteten
+            else
+                econt ()  // Når alle N værdier er genereret
+        loop 0 
+
+
+1.5
+Tester at hvis N er negativt at der ikke udskrives noget
+let examEx5 = Every(Write(RandomFromList(-1,[1;2;3;4;5])));;
+
+Tester at hvis listen er tom at der ikke udskrives noget
+let examEx6 = Every(Write(RandomFromList(1,[])));;
+
+
+
+Opg 2 - Micro-SML: Print statistik
